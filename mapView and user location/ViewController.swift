@@ -19,33 +19,31 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         checkLocationServices()
-        addNewAnnotation()
     }
     
     func addNewAnnotation() {
-        let Bhawarkua = MKPointAnnotation()
-        Bhawarkua.title = "Bhawarkua"
-        Bhawarkua.subtitle = "Bus Stop"
-        Bhawarkua.coordinate = CLLocationCoordinate2D(latitude: 22.692501, longitude: 75.867449)
-        mapView.addAnnotation(Bhawarkua)
+        let location = MKPointAnnotation()
+        location.title = "Treasure Island"
+        location.subtitle = "PVR"
+        location.coordinate = CLLocationCoordinate2D(latitude: 22.721987, longitude: 75.878468)
+        mapView.addAnnotation(location)
     }
     
     func centerViewOnUserLocation() {
         if  let location = locationManager.location?.coordinate {
             let userCenter = CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
-            let region = MKCoordinateRegion(center: userCenter, span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1))
+            let region = MKCoordinateRegion(center: userCenter, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
             mapView.setRegion(region, animated: true)
         }
     }
    
-
     func checkLocationAuthorization() {
         switch CLLocationManager.authorizationStatus() {
         case .authorizedWhenInUse:
             mapView.showsUserLocation = true
             centerViewOnUserLocation()
-            //addNewAnnotation()
-            beginLocationUpdates(locationManagerrr: locationManager)
+            addNewAnnotation()
+            //beginLocationUpdates(locationManagerrr: locationManager)
             break
         case .notDetermined:
             locationManager.requestWhenInUseAuthorization()
@@ -69,50 +67,39 @@ class ViewController: UIViewController {
             setUpLocationManager()
             checkLocationAuthorization()
             } else {
-            
             setUpLocationManager()
-
         }
-    }
-    
-    private func beginLocationUpdates(locationManagerrr: CLLocationManager) {
-        mapView.showsUserLocation = true
-        locationManagerrr.desiredAccuracy = kCLLocationAccuracyBest
-        locationManagerrr.startUpdatingLocation()
-    }
-    
-    func zoomToLatestLocation(with coordinate:CLLocationCoordinate2D) {
-        let zoomRegion = MKCoordinateRegionMakeWithDistance(coordinate, 10000, 10000)
-        mapView.setRegion(zoomRegion, animated: true)
     }
 }
 
 extension ViewController: CLLocationManagerDelegate, MKMapViewDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-//        guard let latestLocation = locations.first else { return }
-//        if currentCoordinate == nil {
-//            zoomToLatestLocation(with: latestLocation.coordinate)
-//        }
-//        currentCoordinate = latestLocation.coordinate
+        let userLocation:CLLocation = locations[0] as CLLocation
+        print("Updating location")
+        let center = CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude)
+        let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+        mapView.setRegion(region, animated: true)
         }
 
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         checkLocationAuthorization()
     }
-    
+
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-          var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: "annotationView")
+        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: "annotationView")
         if annotationView == nil {
             annotationView = MKAnnotationView(annotation: annotation, reuseIdentifier: "annotationView")
         }
-        if let title = annotation.title, title == "Bhawarkua" {
+        if let title = annotation.title, title == "Treasure Island" {
+            let t = CGRect(x: 0, y: 0, width: 50, height: 50)
+            annotationView?.image?.draw(in: t)
             annotationView?.image = UIImage(named: "pin")
         }
             annotationView?.canShowCallout = true
+            //annotationView?.calloutOffset = CGPoint
             return annotationView
         }
-    
 }
 
     
